@@ -10,6 +10,7 @@ module.exports = {
     clean: true,
   },
   devServer: {
+    hot: true,
     static: [
       {
         directory: path.join(__dirname, "src/examples"), // 提供 HTML 文件
