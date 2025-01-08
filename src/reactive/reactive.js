@@ -2,6 +2,9 @@ import { isObject } from "../utils/isObject";
 import { track, trigger } from "./effect";
 const handler = {
   get(target, prop, receiver) {
+    if (prop === "__isReactive") {
+      return true;
+    }
     const res = Reflect.get(target, prop, receiver);
     track(target, prop);
     return res;
@@ -13,15 +16,20 @@ const handler = {
   },
 };
 const proxyMap = new WeakMap();
+export function isReactive(target) {
+  return target && target.__isReactive;
+}
 export function reactive(target) {
   // 检测是否传入对象
   if (!isObject(target)) {
     return target;
   }
+  if (isReactive(target)) {
+    return target;
+  }
   // 检测二次代理
-  const isProxy = proxyMap.get(target);
-  if (isProxy) {
-    return isProxy;
+  if (proxyMap.has(target)) {
+    return proxyMap.get(target);
   }
   const proxy = new Proxy(target, handler);
   proxyMap.set(target, proxy);
